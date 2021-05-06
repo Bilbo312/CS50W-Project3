@@ -19,8 +19,14 @@ textarea {
 }
 
 #ind-subject {
+    display: inline-block;
+    width: 75%;
     font-weight: bold;
     font-size: 24px;
+}
+
+#archive {
+    display: inline-block
 }
 
 #ind-body {

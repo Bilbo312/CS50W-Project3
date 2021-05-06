@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#individual-email').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
   document.querySelector('#compose-form').onsubmit = send_email;
   
@@ -69,10 +70,9 @@ function load_mailbox(mailbox) {
         var div = document.createElement("div");
         div.className = 'listed-email';
         var a = (mailbox=='inbox') ? "From: " + email.sender :"To: " + email.recipients; 
-        var b = email.id;
-        console.log(b);
+        div.style = (email.read==true) ? "background-color:grey" : "background-color:white"
         div.innerHTML =  a + ' Subject: ' + email.subject + ' ' + email.timestamp +' Body: ' + email.body;
-        div.addEventListener('click', () => display_email(b));
+        div.addEventListener('click', () => display_email(email.id));
         mainContainer.appendChild(div);
       });
   });
@@ -90,11 +90,64 @@ function display_email(id) {
     // Print email
     console.log(email);
 
-    // Get details of this email
+    // Get details of this email and insert into HTML
     document.getElementById("ind-subject").innerHTML = email.subject;
     document.getElementById("ind-sender").innerHTML = "From: " + email.sender;
     document.getElementById("ind-recipients").innerHTML = "To: " + email.recipients;
     document.getElementById("ind-body").innerHTML = email.body;
     document.getElementById("ind-time").innerHTML = email.timestamp;
+
+    //update to read
+    update(id,"read")
+
+    //Look for archiving 
+
+    var a = (email.archived == false) ? "archive": "unarchive"
+    if (a=="archive") {
+      document.querySelector('#archive').innerHTML = `${a.charAt(0).toUpperCase() + a.slice(1)}`;
+      document.querySelector('#archive').addEventListener('click', () => update(id,"archive"));
+    } else {
+      document.querySelector('#archive').innerHTML = `${a.charAt(0).toUpperCase() + a.slice(1)}`;
+      document.querySelector('#archive').addEventListener('click', () => update(id,"unarchive"));
+    }
+
   });
+}
+
+//Changes the state of read and archived in emails
+function update(id, action) {
+  if (action=="read") {
+    fetch('/emails/' + id, {
+      method: 'PUT',
+      body: JSON.stringify({
+        read: true
+      })
+    })
+  }
+  if (action=="unread") {
+    fetch('/emails/' + id, {
+      method: 'PUT',
+      body: JSON.stringify({
+        read: false
+      })
+    })
+  }
+  if (action=="archive") {
+    fetch('/emails/' + id, {
+      method: 'PUT',
+      body: JSON.stringify({
+        archived: true
+      })
+    })
+    .then(load_mailbox('archive'))
+  } 
+  if (action=="unarchive") {
+    fetch('/emails/' + id, {
+      method: 'PUT',
+      body: JSON.stringify({
+        archived: false
+      })
+    })
+    .then(load_mailbox('inbox'))
+  }
 }
