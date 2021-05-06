@@ -51,6 +51,7 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#individual-email').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -62,14 +63,38 @@ function load_mailbox(mailbox) {
       // Print emails
       console.log(emails);
 
-      // ... do something else with emails ...
+      // Create a list of all emails in mailbox
       var mainContainer = document.getElementById("emails-view");
       for (var i = 0; i < emails.length; i++) {
         var div = document.createElement("div");
         div.className = 'listed-email';
-        var a = (mailbox=='inbox') ? "From: " + emails[i].sender :"To: " + emails[i].recipients; //Bit working on to change if says who recived or who sent 
+        var a = (mailbox=='inbox') ? "From: " + emails[i].sender :"To: " + emails[i].recipients; 
+        var b = emails[i].id;
+        console.log(b);
         div.innerHTML =  a + ' Subject: ' + emails[i].subject + ' ' + emails[i].timestamp +' Body: ' + emails[i].body;
+        div.addEventListener('click', () => display_email(b)); //Only puts 1 in for some reason 
         mainContainer.appendChild(div);
       }
+  });
+}
+
+function display_email(id) {
+    // Show the email and hide other views
+    document.querySelector('#emails-view').style.display = 'none';
+    document.querySelector('#compose-view').style.display = 'none';
+    document.querySelector('#individual-email').style.display = 'block';
+
+  fetch('/emails/' + id)
+  .then(response => response.json())
+  .then(email => {
+    // Print email
+    console.log(email);
+
+    // Get details of this email
+    document.getElementById("ind-subject").innerHTML = email.subject;
+    document.getElementById("ind-sender").innerHTML = "From: " + email.sender;
+    document.getElementById("ind-recipients").innerHTML = "To: " + email.recipients;
+    document.getElementById("ind-body").innerHTML = email.body;
+    document.getElementById("ind-time").innerHTML = email.timestamp;
   });
 }
