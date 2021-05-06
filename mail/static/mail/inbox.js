@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
-  document.querySelector('#test').addEventListener('click', send_email);
 
 
   // By default, load the inbox
@@ -41,8 +40,7 @@ function send_email() {
   .then(response => response.json())
   .then(result => {
       // Print result
-      console.log("Email Sent" + document.querySelector('#compose-body').value);
-      document.getElementById("p1").innerHTML = "New text!";
+      console.log("Email Sent: " + document.querySelector('#compose-body').value);
       load_mailbox('sent');
   });
   return false;
@@ -56,14 +54,22 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
-
-  fetch('/emails/inbox')
+  
+  console.log("load_email")
+  fetch('/emails/'+mailbox)
   .then(response => response.json())
   .then(emails => {
       // Print emails
-      //console.log(emails);
+      console.log(emails);
 
       // ... do something else with emails ...
+      var mainContainer = document.getElementById("emails-view");
+      for (var i = 0; i < emails.length; i++) {
+        var div = document.createElement("div");
+        div.className = 'listed-email';
+        var a = (mailbox=='inbox') ? "From: " + emails[i].sender :"To: " + emails[i].recipients; //Bit working on to change if says who recived or who sent 
+        div.innerHTML =  a + ' Subject: ' + emails[i].subject + ' ' + emails[i].timestamp +' Body: ' + emails[i].body;
+        mainContainer.appendChild(div);
+      }
   });
-
-  }
+}
