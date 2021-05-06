@@ -2,7 +2,6 @@ textarea {
     min-height: 400px;
 }
 
-
 .listed-email { 
     padding-top: 5px;
     padding-bottom: 5px;
@@ -11,4 +10,24 @@ textarea {
     border-radius: 10px;
     text-indent: 5px;
     border-collapse: collapse;
+}
+
+.email-row {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 15px;
+}
+
+#ind-subject {
+    font-weight: bold;
+    font-size: 24px;
+}
+
+#ind-body {
+    font-size: 20px;
+}
+
+#ind-time {
+    text-align: right;
+    padding-top: 8px;
 }

@@ -65,16 +65,16 @@ function load_mailbox(mailbox) {
 
       // Create a list of all emails in mailbox
       var mainContainer = document.getElementById("emails-view");
-      for (var i = 0; i < emails.length; i++) {
+      emails.forEach(email => {
         var div = document.createElement("div");
         div.className = 'listed-email';
-        var a = (mailbox=='inbox') ? "From: " + emails[i].sender :"To: " + emails[i].recipients; 
-        var b = emails[i].id;
+        var a = (mailbox=='inbox') ? "From: " + email.sender :"To: " + email.recipients; 
+        var b = email.id;
         console.log(b);
-        div.innerHTML =  a + ' Subject: ' + emails[i].subject + ' ' + emails[i].timestamp +' Body: ' + emails[i].body;
-        div.addEventListener('click', () => display_email(b)); //Only puts 1 in for some reason 
+        div.innerHTML =  a + ' Subject: ' + email.subject + ' ' + email.timestamp +' Body: ' + email.body;
+        div.addEventListener('click', () => display_email(b));
         mainContainer.appendChild(div);
-      }
+      });
   });
 }
 
