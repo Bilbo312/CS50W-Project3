@@ -12,18 +12,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-function compose_email() {
+function compose_email(email) {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#individual-email').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
   document.querySelector('#compose-form').onsubmit = send_email;
-  
-  // Clear out composition fields
-  document.querySelector('#compose-recipients').value = '';
-  document.querySelector('#compose-subject').value = '';
-  document.querySelector('#compose-body').value = '';
 
+  //If is reply, put re infront of subject, fill in recipients and body 
+  if (email.id) {
+    document.querySelector('#compose-recipients').value = email.sender;
+    var reply = (email.subject.slice(0,3)==='RE:') ? '' : 'RE: ';
+    console.log(reply)
+    document.querySelector('#compose-subject').value = reply + email.subject;
+    document.querySelector('#compose-body').value = '\n' + 'On ' + email.timestamp + ' ' + email.sender + ' wrote: ' + '\n' + email.body;
+  } else {
+    // Clear out composition fields
+    document.querySelector('#compose-recipients').value = '';
+    document.querySelector('#compose-subject').value = '';
+    document.querySelector('#compose-body').value = '';
+  }
   console.log("Compose_email")
 
 }
@@ -35,7 +43,7 @@ function send_email() {
     body: JSON.stringify({
         recipients: document.querySelector('#compose-recipients').value,
         subject: document.querySelector('#compose-subject').value,
-        body: document.querySelector('#compose-body').value,
+        body: document.querySelector('#compose-body').value + '\n',
     })
   })
   .then(response => response.json())
@@ -71,7 +79,7 @@ function load_mailbox(mailbox) {
         div.className = 'listed-email';
         var a = (mailbox=='inbox') ? "From: " + email.sender :"To: " + email.recipients; 
         div.style = (email.read==true) ? "background-color:grey" : "background-color:white"
-        div.innerHTML =  a + ' Subject: ' + email.subject + ' ' + email.timestamp +' Body: ' + email.body;
+        div.innerHTML =  a + ' Subject: ' + email.subject + ' Sent: ' + email.timestamp;
         div.addEventListener('click', () => display_email(email.id));
         mainContainer.appendChild(div);
       });
@@ -110,6 +118,9 @@ function display_email(id) {
       document.querySelector('#archive').innerHTML = `${a.charAt(0).toUpperCase() + a.slice(1)}`;
       document.querySelector('#archive').addEventListener('click', () => update(id,"unarchive"));
     }
+
+    //Look for replying 
+    document.querySelector('#reply').addEventListener('click', () => compose_email(email));
 
   });
 }
